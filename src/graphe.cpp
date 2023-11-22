@@ -1,5 +1,5 @@
 #include "graphe.h"
-
+//---------------------------Lecture fichier-------------------------------------
 void litFichierEntiers(const char * nomFichier)
 //preconditions : nomFichier chaine de caracteres designant le nom d'un fichier
 //                contenant des entiers separes par des caracteres d'espacement
@@ -15,6 +15,7 @@ void litFichierEntiers(const char * nomFichier)
   ifs.close();
 }
 
+//----------------------------Constructeur graphe
 Graphe::Graphe()
 {
 }

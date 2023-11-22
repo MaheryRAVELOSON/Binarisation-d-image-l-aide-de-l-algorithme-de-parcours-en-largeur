@@ -10,12 +10,15 @@
 #include <fstream> //ifstream, ofstream
 #include <cstdlib> //exit
 
+void litFichierEntiers(const char * nomFichier);
+
+//---------------------------------Classe Graphe---------------------------------
 class Graphe
 {
     public:
     int Hauteur;
     int Largeur;
-    Pixel TabPixel[Hauteur*Largeur];
+    Pixel * TabPixel;
 
     Graphe();
 };
