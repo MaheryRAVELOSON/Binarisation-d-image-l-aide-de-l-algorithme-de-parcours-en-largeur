@@ -1,11 +1,13 @@
 #include "graphe.h"
 #include <stdio.h>
-#include <string>
-using namespace std;
+
 
 int main(void)
 {
-    std::string nomFichier= "data/data.pgm";
-    litFichierEntiers(nomFichier.c_str());
+    Graphe TestGraphe;
+    for(int i= 0; i<TestGraphe.Hauteur*TestGraphe.Largeur; i++)
+    {
+        cout<<TestGraphe.TabPixel[i].intensite<<endl;
+    }
     return 0;
 }

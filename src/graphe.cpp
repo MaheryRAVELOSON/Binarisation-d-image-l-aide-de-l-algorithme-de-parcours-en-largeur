@@ -1,21 +1,36 @@
 #include "graphe.h"
 //---------------------------Lecture fichier-------------------------------------
-void litFichierEntiers(const char * nomFichier)
-//preconditions : nomFichier chaine de caracteres designant le nom d'un fichier
-//                contenant des entiers separes par des caracteres d'espacement
-//postcondition : affichage du contenu du fichier sur la sortie standard
+void Graphe::ouvrir(const string & filename)
 {
-  std::ifstream ifs;
-  ifs.open(nomFichier);
-  if(ifs.bad())
-    {std::cout<<"Impossible d'ouvrir le fichier "<<nomFichier<<" en lecture \n"; exit(1);}
-  int temp;
-  while(ifs >> temp)
-    std::cout<<"Entier suivant "<<temp<< std::endl;
-  ifs.close();
+  ifstream fichier (filename.c_str());
+
+  assert(fichier.is_open());
+	string mot;
+  int rien;
+
+	fichier >> mot >> Hauteur >> Largeur >> rien;
+	assert(Hauteur > 0 && Largeur > 0);
+  cout<<"Hauteur = " <<Hauteur<< " Et Largeur= "<<Largeur<<endl;
+  
+	if (TabPixel != nullptr)
+  {
+    delete [] TabPixel;
+  }
+	TabPixel = new Pixel [Hauteur*Largeur];
+  
+  for(int y=0; y<Hauteur*Largeur; ++y)
+  {
+    fichier >> TabPixel[y].intensite;
+  }
+    fichier.close();
+    cout << "Lecture de l'image " << filename << " ... OK\n";
 }
+
 
 //----------------------------Constructeur graphe
 Graphe::Graphe()
 {
+  TabPixel = nullptr;
+  std::string nomFichier= "data/data.pgm";
+  ouvrir(nomFichier);
 }

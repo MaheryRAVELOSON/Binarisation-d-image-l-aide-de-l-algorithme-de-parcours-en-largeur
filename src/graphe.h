@@ -9,8 +9,11 @@
 #include <cstdio>
 #include <fstream> //ifstream, ofstream
 #include <cstdlib> //exit
+#include <string>
+#include <fstream>
 
-void litFichierEntiers(const char * nomFichier);
+using namespace std;
+
 
 //---------------------------------Classe Graphe---------------------------------
 class Graphe
@@ -20,6 +23,7 @@ class Graphe
     int Largeur;
     Pixel * TabPixel;
 
+    void ouvrir(const string & filename);
     Graphe();
 };
 
