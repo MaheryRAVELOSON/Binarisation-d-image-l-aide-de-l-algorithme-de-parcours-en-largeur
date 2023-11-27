@@ -97,6 +97,61 @@ void Graphe::InitVoisin()
   }
 }
 
+//-------------------------------------------------------------------------------
+void Graphe::SetCap()
+{
+  int sigma= 1;
+  int alpha= 1;
+
+  for(int i=0; i<L; i++)
+  {
+    for(int j=0; j<C; j++)
+    {
+      int Ind_P_Actuel = GetIndPixel(i, j);
+//_________________Pour Arc Nord
+      if(TabPixel[Ind_P_Actuel].Sortant_Nord != nullptr)
+      {
+        int Intensite_Actuel = TabPixel[Ind_P_Actuel].intensite;
+        int Intensite_V_Nord = TabPixel[Ind_P_Actuel].Sortant_Nord->intensite;
+        int Diff_I = abs(Intensite_Actuel - Intensite_V_Nord);
+        int capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
+        TabPixel[Ind_P_Actuel].Cap_E_Nord= capacite;
+        TabPixel[Ind_P_Actuel].Cap_S_Nord= capacite;
+      }
+//_________________Pour Arc Sud
+      if(TabPixel[Ind_P_Actuel].Sortant_Nord != nullptr)
+      {
+        int Intensite_Actuel = TabPixel[Ind_P_Actuel].intensite;
+        int Intensite_V_Sud = TabPixel[Ind_P_Actuel].Sortant_Sud->intensite;
+        int Diff_I = abs(Intensite_Actuel - Intensite_V_Sud);
+        int capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
+        TabPixel[Ind_P_Actuel].Cap_E_Sud= capacite;
+        TabPixel[Ind_P_Actuel].Cap_S_Sud= capacite;
+      }
+//_________________Pour Arc Est
+      if(TabPixel[Ind_P_Actuel].Sortant_Nord != nullptr)
+      {
+        int Intensite_Actuel = TabPixel[Ind_P_Actuel].intensite;
+        int Intensite_V_Est = TabPixel[Ind_P_Actuel].Sortant_Est->intensite;
+        int Diff_I = abs(Intensite_Actuel - Intensite_V_Est);
+        int capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
+        TabPixel[Ind_P_Actuel].Cap_E_Est= capacite;
+        TabPixel[Ind_P_Actuel].Cap_S_Est= capacite;
+      }
+//_________________Pour Arc Ouest
+      if(TabPixel[Ind_P_Actuel].Sortant_Nord != nullptr)
+      {
+        int Intensite_Actuel = TabPixel[Ind_P_Actuel].intensite;
+        int Intensite_V_Est = TabPixel[Ind_P_Actuel].Sortant_Est->intensite;
+        int Diff_I = abs(Intensite_Actuel - Intensite_V_Est);
+        int capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
+        TabPixel[Ind_P_Actuel].Cap_E_Ouest= capacite;
+        TabPixel[Ind_P_Actuel].Cap_S_Ouest= capacite;
+      }
+    }
+  }
+}
+
 //----------------------------Constructeur graphe--------------------------------
 Graphe::Graphe()
 {
@@ -104,7 +159,4 @@ Graphe::Graphe()
   std::string nomFichier= "data/data.pgm";
   ouvrir(nomFichier); //remplissage des INTENSITEE seulement de chaque pixel
   InitVoisin(); //remplissage des 4 arcs voisins de chaque pixel.
-
-  nomFichier= "data/La_Notre.pgm";
-  sauver(nomFichier);
 }

@@ -38,5 +38,10 @@ int main(void)
         cout<<"Voisin Ouest= "<<TestGraphe.TabPixel[TestGraphe.GetIndPixel(i, j)].Entrant_Ouest->intensite<<endl;
     }
     cout<<endl<<"---Fin Affichage des voisin---"<<endl;
+    
+
+//___________________________Sauvegarde du fichier
+    std::string nomFichier= "data/La_Notre.pgm";
+    TestGraphe.sauver(nomFichier);
     return 0;
 }

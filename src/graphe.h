@@ -11,6 +11,8 @@
 #include <cstdlib> //exit
 #include <string>
 #include <fstream>
+#include <math.h>
+#include <cmath> // pour l'exposant
 
 using namespace std;
 
@@ -32,6 +34,8 @@ class Graphe
     int GetIndPixel(const int i, const int j);
 //-------------------------------------------------------------------------------
     void InitVoisin();
+//-------------------------------------------------------------------------------
+    void SetCap();
 //-------------------------------------------------------------------------------
     Graphe();
 };
