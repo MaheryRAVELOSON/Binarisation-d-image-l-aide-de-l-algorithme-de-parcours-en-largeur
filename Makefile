@@ -22,4 +22,4 @@ $(Main_O): $(Graphe).h $(Pixel).h $(Main).cpp
 	g++ -Wall -g -c $(Main).cpp -o $(Main_O)
 
 clean:
-	rm obj/*.o bin/*.out
+	rm obj/*.o bin/*.out data/La_Notre.pgm
