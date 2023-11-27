@@ -16,7 +16,7 @@
 
 using namespace std;
 
-
+int ln(int x);
 //---------------------------------Classe Graphe---------------------------------
 class Graphe
 {

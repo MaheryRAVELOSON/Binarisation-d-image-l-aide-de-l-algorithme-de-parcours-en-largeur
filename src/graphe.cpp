@@ -1,4 +1,10 @@
 #include "graphe.h"
+
+//---------------------------logarithme nepirien-------------------------------------
+int ln(int x)
+{
+    return std::log(x) / std::log(M_E); //M_E est exponentielle de e
+}
 //---------------------------Lecture fichier-------------------------------------
 void Graphe::ouvrir(const string & filename)
 {
@@ -16,7 +22,7 @@ void Graphe::ouvrir(const string & filename)
   {
     delete [] TabPixel;
   }
-	TabPixel = new Pixel [L*C]; // Création du tableau de pointeur de Pixel
+	TabPixel = new Pixel [L*C+2]; // Création du tableau de pointeur de Pixel
   
   for(int y=0; y<L*C; ++y)
   {
@@ -100,8 +106,11 @@ void Graphe::InitVoisin()
 //-------------------------------------------------------------------------------
 void Graphe::SetCap()
 {
-  int sigma= 1;
+  int sigma= 0;
+  float Moyenne= 0;
   int alpha= 1;
+  float D1 = 0;
+  float D2 = 0;
 
   for(int i=0; i<L; i++)
   {
@@ -114,40 +123,73 @@ void Graphe::SetCap()
         int Intensite_Actuel = TabPixel[Ind_P_Actuel].intensite;
         int Intensite_V_Nord = TabPixel[Ind_P_Actuel].Sortant_Nord->intensite;
         int Diff_I = abs(Intensite_Actuel - Intensite_V_Nord);
+        
+        Moyenne = (Intensite_Actuel+ Intensite_V_Nord)/2;
+        D1 =  pow((Intensite_Actuel- Moyenne), 2);
+        D2 =  pow((Intensite_V_Nord- Moyenne), 2);
+        sigma = sqrt(D1+D2);
+
         int capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
         TabPixel[Ind_P_Actuel].Cap_E_Nord= capacite;
         TabPixel[Ind_P_Actuel].Cap_S_Nord= capacite;
       }
 //_________________Pour Arc Sud
-      if(TabPixel[Ind_P_Actuel].Sortant_Nord != nullptr)
+      if(TabPixel[Ind_P_Actuel].Sortant_Sud != nullptr)
       {
         int Intensite_Actuel = TabPixel[Ind_P_Actuel].intensite;
         int Intensite_V_Sud = TabPixel[Ind_P_Actuel].Sortant_Sud->intensite;
         int Diff_I = abs(Intensite_Actuel - Intensite_V_Sud);
+
+        Moyenne = (Intensite_Actuel+ Intensite_V_Sud)/2;
+        D1 =  pow((Intensite_Actuel- Moyenne), 2);
+        D2 =  pow((Intensite_V_Sud- Moyenne), 2);
+        sigma = sqrt(D1+D2);
+
         int capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
         TabPixel[Ind_P_Actuel].Cap_E_Sud= capacite;
         TabPixel[Ind_P_Actuel].Cap_S_Sud= capacite;
       }
 //_________________Pour Arc Est
-      if(TabPixel[Ind_P_Actuel].Sortant_Nord != nullptr)
+      if(TabPixel[Ind_P_Actuel].Sortant_Est != nullptr)
       {
         int Intensite_Actuel = TabPixel[Ind_P_Actuel].intensite;
         int Intensite_V_Est = TabPixel[Ind_P_Actuel].Sortant_Est->intensite;
         int Diff_I = abs(Intensite_Actuel - Intensite_V_Est);
+
+        Moyenne = (Intensite_Actuel+ Intensite_V_Est)/2;
+        D1 =  pow((Intensite_Actuel- Moyenne), 2);
+        D2 =  pow((Intensite_V_Est- Moyenne), 2);
+        sigma = sqrt(D1+D2);
+
         int capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
         TabPixel[Ind_P_Actuel].Cap_E_Est= capacite;
         TabPixel[Ind_P_Actuel].Cap_S_Est= capacite;
       }
 //_________________Pour Arc Ouest
-      if(TabPixel[Ind_P_Actuel].Sortant_Nord != nullptr)
+      if(TabPixel[Ind_P_Actuel].Sortant_Ouest != nullptr)
       {
         int Intensite_Actuel = TabPixel[Ind_P_Actuel].intensite;
-        int Intensite_V_Est = TabPixel[Ind_P_Actuel].Sortant_Est->intensite;
-        int Diff_I = abs(Intensite_Actuel - Intensite_V_Est);
+        int Intensite_V_Ouest = TabPixel[Ind_P_Actuel].Sortant_Ouest->intensite;
+        int Diff_I = abs(Intensite_Actuel - Intensite_V_Ouest);
+
+        Moyenne = (Intensite_Actuel+ Intensite_V_Ouest)/2;
+        D1 =  pow((Intensite_Actuel- Moyenne), 2);
+        D2 =  pow((Intensite_V_Ouest- Moyenne), 2);
+        sigma = sqrt(D1+D2);
+
         int capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
         TabPixel[Ind_P_Actuel].Cap_E_Ouest= capacite;
         TabPixel[Ind_P_Actuel].Cap_S_Ouest= capacite;
       }
+//_________________Pour Arc Source
+      int Diff_I = 255-TabPixel[Ind_P_Actuel].intensite;
+      int Cap_S  = - alpha * ln(Diff_I/255);
+      TabPixel[Ind_P_Actuel].Cap_E_Source = Cap_S;
+
+//_________________Pour Arc Puit
+      int Cap_P  = - alpha * ln(TabPixel[Ind_P_Actuel].intensite/255);
+      TabPixel[Ind_P_Actuel].Cap_S_Puit = Cap_P;
+          
     }
   }
 }
