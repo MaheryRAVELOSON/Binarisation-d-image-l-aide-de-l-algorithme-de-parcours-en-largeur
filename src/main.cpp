@@ -5,7 +5,7 @@
 int main(void)
 {
     Graphe TestGraphe;
-//___________________________Affichage des donnée
+//___________________________Affichage des données
     cout<<endl<<"---Affichage des données---"<<endl;
     for(int i= 0; i<TestGraphe.L*TestGraphe.C; i++)
     {
@@ -13,7 +13,7 @@ int main(void)
     }
     cout<<endl<<"---Fin Affichage des données---"<<endl;
 
-//___________________________Affichage des 4 voisin de la 1ère case en partant de 0:
+//___________________________Affichage des 4 voisins de la 1ère case en partant de 0:
     int i=0; //Ligne 0
     int j=1; //Colonne 1
     cout<<endl<<"---Affichage des 4 voisin de la case "<<
@@ -54,6 +54,7 @@ int main(void)
     cout<<endl<<"---FIN Affichage des capacité entrant depuis la source de chaque pixel "<<endl;
 
 //___________________________Affichage des capacité sortant vers le puit
+    /*
     cout<<endl<<"---Affichage des capacité sortant vers le puit depuis chaque pixel: "<<endl;
     k=0;
     for(int i=0; i<TestGraphe.C*TestGraphe.L; i++)
@@ -69,7 +70,10 @@ int main(void)
     cout<<endl<<"capacité max ="<< k<<endl;
     cout<<endl<<"---FIN Affichage des capacité sortant vers le puit depuis chaque pixel: "<<endl;
 
-    cout<<endl<<"ln de  = "<<ln(0.65882)<<endl;
+    cout<<endl<<"ln de 0.5  = "<<ln(0.5)<<endl;
+    cout<<endl<<"ln de 0 = "<<ln(0)<<endl;
+    cout<<endl<<"ln de 1 = "<<ln(1)<<endl;
+    */
 
 //___________________________Sauvegarde du fichier
     std::string nomFichier= "data/La_Notre.pgm";
