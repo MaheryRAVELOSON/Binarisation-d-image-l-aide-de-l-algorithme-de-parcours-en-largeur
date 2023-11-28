@@ -16,7 +16,9 @@
 
 using namespace std;
 
-int ln(int x);
+//double ln(float x); //x doit être en float !
+double SquareRoot(double X);
+double ln(double x);
 //---------------------------------Classe Graphe---------------------------------
 class Graphe
 {

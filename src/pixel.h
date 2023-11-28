@@ -28,22 +28,6 @@ class Pixel
     int Cap_S_Ouest;
     int flot_S_Ouest;
 //------------------
-    Pixel * Entrant_Nord; // "Entrant" = Qui pointe vers le pixel actuel venant d'un autre pixel
-    int Cap_E_Nord;
-    int flot_E_Nord;
-//------------------
-    Pixel * Entrant_Sud;
-    int Cap_E_Sud;
-    int flot_E_Sud;
-//------------------
-    Pixel * Entrant_Est;
-    int Cap_E_Est;
-    int flot_E_Est;
-//------------------
-    Pixel * Entrant_Ouest;
-    int Cap_E_Ouest;
-    int flot_E_Ouest;
-//------------------
     Pixel * Sortant_Puit;
     int Cap_S_Puit;
     int flot_S_Puit;

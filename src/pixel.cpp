@@ -3,22 +3,6 @@
 //-------------------------------------------------------------------------------
 Pixel::Pixel()
 {
-    Entrant_Nord= nullptr;
-    Cap_E_Nord= 0;
-    flot_E_Nord= 0;
-
-    Entrant_Sud= nullptr;
-    Cap_E_Sud= 0;
-    flot_E_Sud= 0;
-
-    Entrant_Est= nullptr;
-    Cap_E_Est= 0;
-    flot_E_Est= 0;
-
-    Entrant_Ouest= nullptr;
-    Cap_E_Ouest= 0;
-    flot_E_Ouest= 0;
-
     Sortant_Nord= nullptr;
     Cap_S_Nord= 0;
     flot_S_Nord= 0;
