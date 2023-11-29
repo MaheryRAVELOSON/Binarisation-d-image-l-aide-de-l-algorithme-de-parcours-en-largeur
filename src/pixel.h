@@ -11,6 +11,7 @@ class Pixel
 {
     public:
     int intensite;
+    bool couleurBlanc; //utile pour le parcours en Largeur
 //------------------
     Pixel * Sortant_Nord; //"sortant" = qui part du pixel actuel vers un autre
     int Cap_S_Nord;

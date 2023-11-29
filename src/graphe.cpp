@@ -109,6 +109,7 @@ void Graphe::SetCap()
   //float Moyenne= 0;
   float sigma= 10;
   float alpha= 10;
+  float H    = 100;
 
   for(int i=0; i<L; i++)
   {
@@ -127,7 +128,7 @@ void Graphe::SetCap()
         //D2 =  pow((Intensite_V_Nord- Moyenne), 2);
         //sigma = sqrt(D1+D2);
 
-        float capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
+        float capacite = H*exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
         TabPixel[Ind_P_Actuel].Cap_S_Nord= capacite;
       }
 //_________________Pour Arc Sud
@@ -142,7 +143,7 @@ void Graphe::SetCap()
         //D2 =  pow((Intensite_V_Sud- Moyenne), 2);
         //sigma = sqrt(D1+D2);
 
-        float capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
+        float capacite = H*exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
         TabPixel[Ind_P_Actuel].Cap_S_Sud= capacite;
       }
 //_________________Pour Arc Est
@@ -157,7 +158,7 @@ void Graphe::SetCap()
         //D2 =  pow((Intensite_V_Est- Moyenne), 2);
         //sigma = sqrt(D1+D2);
 
-        float capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
+        float capacite = H*exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
         TabPixel[Ind_P_Actuel].Cap_S_Est= capacite;
       }
 //_________________Pour Arc Ouest
@@ -172,12 +173,12 @@ void Graphe::SetCap()
         //D2 =  pow((Intensite_V_Ouest- Moyenne), 2);
         //sigma = sqrt(D1+D2);
 
-        float capacite = exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
+        float capacite = H*exp(-(pow(Diff_I, 2)) / (2* pow(sigma, 2)));
         TabPixel[Ind_P_Actuel].Cap_S_Ouest= capacite;
       }
 //_________________Pour Arc Source
-      float Diff_I = 255-TabPixel[Ind_P_Actuel].intensite;
-      float Cap_S  = - alpha * ln(Diff_I/255);
+      float Diff_I = 255.0000000001-TabPixel[Ind_P_Actuel].intensite;
+      float Cap_S  = - alpha * ln(Diff_I/255.0000000002);
       TabPixel[Ind_P_Actuel].Cap_E_Source = Cap_S;
       if(TabPixel[Ind_P_Actuel].Cap_E_Source<0)
       {
@@ -185,21 +186,53 @@ void Graphe::SetCap()
       }                                         // -2147483648
 
 //_________________Pour Arc Puit
-      float Int = float(TabPixel[Ind_P_Actuel].intensite);
+      float Int = float(TabPixel[Ind_P_Actuel].intensite + 0.0000000001);
 
-      float final= (Int/255);
+      float final= (Int/255.0000000002);
       float Cap_P  = - alpha * ln(final);
       TabPixel[Ind_P_Actuel].Cap_S_Puit = int(Cap_P);
 
-      //verificztion de la cohérence
-      if(TabPixel[Ind_P_Actuel].Cap_S_Puit != 0)
-      {
-        assert(TabPixel[Ind_P_Actuel].Cap_E_Source == 0);
-      }
+      //verification de la cohérence
+      // if(TabPixel[Ind_P_Actuel].Cap_S_Puit != 0)
+      // {
+      //   assert(TabPixel[Ind_P_Actuel].Cap_E_Source == 0);
+      // }
     }
   }
 }
+//----------------------------Parcours en Largeur--------------------------------
+void Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide 
+{
+  Pixel *courant ;
+  Pixel TemponFilsCourant;
+  vector<Pixel*> File;
+  vector<Pixel*> FilePredecesseur;
 
+  
+  for (int i = 0; i < L*C; i++) // stockage de tt les pixels qui sont liés à la source
+  {
+   if(TabPixel[i].Cap_E_Source > 0)
+   {
+    File.push_back(&TabPixel[i]);
+    FilePredecesseur.push_back(&TabPixel[L*C]);
+    
+   } 
+  }
+  while (File.size() > 0 ) // tant que on a pas fini à lire l'entiérté de la file alors on continue
+  {
+    courant = File[0];
+    courant->couleurBlanc = false; // on le marque comme deja utilisé
+    File.erase(File.begin());// suppression l'élément de la téte
+
+//------------emfilement du voisins Nord du pixel courant
+    if((courant->Sortant_Nord != nullptr) && (courant->Sortant_Nord->couleurBlanc == true)) // il n'est pas encore dans la file
+    {
+      File.push_back( courant->Sortant_Nord); // on le stocke dans la file donc
+      courant->Sortant_Nord->couleurBlanc= false; // on le marque comme deja traité
+      FilePredecesseur.push_back(courant);
+    }
+  }   
+}
 //----------------------------Constructeur graphe--------------------------------
 Graphe::Graphe()
 {

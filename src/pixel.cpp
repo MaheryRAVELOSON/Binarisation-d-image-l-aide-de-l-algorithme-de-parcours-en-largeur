@@ -3,6 +3,7 @@
 //-------------------------------------------------------------------------------
 Pixel::Pixel()
 {
+    couleurBlanc = true;
     Sortant_Nord= nullptr;
     Cap_S_Nord= 0;
     flot_S_Nord= 0;

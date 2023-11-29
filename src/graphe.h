@@ -12,6 +12,7 @@
 #include <string>
 #include <fstream>
 #include <math.h>
+#include <vector>
 #include <cmath> // pour l'exposant
 
 using namespace std;
@@ -40,6 +41,8 @@ class Graphe
     void SetCap();
 //-------------------------------------------------------------------------------
     Graphe();
+//-------------------------------------------------------------------------------
+    void ParcoursLargeur();    
 };
 
 
