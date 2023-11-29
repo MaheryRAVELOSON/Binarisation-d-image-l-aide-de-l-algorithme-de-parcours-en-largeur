@@ -200,37 +200,90 @@ void Graphe::SetCap()
     }
   }
 }
-//----------------------------Parcours en Largeur--------------------------------
-void Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide 
-{
-  Pixel *courant ;
-  Pixel TemponFilsCourant;
-  vector<Pixel*> File;
-  vector<Pixel*> FilePredecesseur;
 
-  
-  for (int i = 0; i < L*C; i++) // stockage de tt les pixels qui sont liés à la source
+//-------------------------------------------------------------------------------
+int Graphe::IndiceTab(Pixel * AdPixel)
+{
+  int i = 0;
+  while ((&TabPixel[i]!= AdPixel) && (i < L*C))
   {
-   if(TabPixel[i].Cap_E_Source > 0)
-   {
-    File.push_back(&TabPixel[i]);
-    FilePredecesseur.push_back(&TabPixel[L*C]);
-    
-   } 
+    if (&TabPixel[i]== AdPixel)
+    {
+      return i;
+    }
+    i++; 
   }
+   return -1; // en cas d'innéxistance
+}    
+//----------------------------Parcours en Largeur--------------------------------
+int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide 
+{
+  Pixel *courant ; // il va parcourir la file 
+  Pixel TemponFilsCourant;
+  vector<int> File; //pour stocker les INDICE de l'ordre des pixels dans la file pour le parcours en largeur
+  int FilePredecesseur[L*C];// Pour stocker les indices des prédecesseur du pixel qui sont dans la file
+  bool PixelDejaVu[L*C]; // pour marquer les indices des pixels deja exploiter
+  assert(File.size()==0);
+  bool cheminValide = false;
+  int FlotMin= hein;
+  
+  for (int i = 0; i < L*C; i++) // stockage de tt les indices du pixels qui sont liés à la source
+  {
+   if(TabPixel[i].Cap_E_Source > 0) // si le pixel est relié à la source 
+   { //stockage de son indice sur les files 
+    File.push_back(i);
+   } 
+   PixelDejaVu[i]= false; 
+  }
+//------------------------
   while (File.size() > 0 ) // tant que on a pas fini à lire l'entiérté de la file alors on continue
   {
-    courant = File[0];
-    courant->couleurBlanc = false; // on le marque comme deja utilisé
-    File.erase(File.begin());// suppression l'élément de la téte
+    courant = &TabPixel[File[0]]; // on utilise la constante 0 car comme on manipule une "file", on ne peut
+                                  // manipuler que la tête
+    PixelDejaVu[File[0]]= true; // on le marque comme deja utilisé
+
+// verification du chemin DIRECTE vers le Puit avant de continuer sur ses voisins
+    int Flot = TabPixel[File[0]].Cap_S_Puit - TabPixel[File[0]].flot_S_Puit;
+    if(Flot > 0)
+    {
+      TabPixel[File[0]].flot_S_Puit += Flot; //Augmentation du flot dans l'arc à max
+      assert(TabPixel[File[0]].flot_S_Puit <= TabPixel[File[0]].Cap_S_Puit);
+      cheminValide = true;
+      return Flot;
+    }
 
 //------------emfilement du voisins Nord du pixel courant
-    if((courant->Sortant_Nord != nullptr) && (courant->Sortant_Nord->couleurBlanc == true)) // il n'est pas encore dans la file
+    if((courant->Sortant_Nord != nullptr) && (cheminValide= false)) // si il existe et qu'on a pas encore un chemin valide
     {
-      File.push_back( courant->Sortant_Nord); // on le stocke dans la file donc
-      courant->Sortant_Nord->couleurBlanc= false; // on le marque comme deja traité
-      FilePredecesseur.push_back(courant);
-    }
+      int IndiceNord = IndiceTab(courant->Sortant_Nord); //Alors on cherche son indice.
+      assert(IndiceNord >= 0 && IndiceNord< L*C);
+//_____verification du chemin DIRECTE vers le Puit avant de continuer sur ses voisins
+      Flot = TabPixel[IndiceNord].Cap_S_Puit - TabPixel[IndiceNord].flot_S_Puit;
+      if(Flot > 0)
+      {
+        TabPixel[IndiceNord].flot_S_Puit += Flot; //Augmentation du flot dans l'arc à max
+        assert(TabPixel[IndiceNord].flot_S_Puit <= TabPixel[IndiceNord].Cap_S_Puit);
+        cheminValide = true;
+        return Flot;
+      }
+//______Verification vers le voisin nord
+      if(PixelDejaVu[IndiceNord]== false) // il n'est pas encore dans la file
+      {
+        if(courant->flot_S_Nord < courant->Cap_S_Nord) // on verifie si l'arc menant au Nord n'est pas plein: 
+        {//si il est encore accessible
+          File.push_back(IndiceNord); // on le stocke dans la file donc
+          PixelDejaVu[IndiceNord]= true; // on le marque comme deja traité pour éviter de le rajouter plusieurs
+                                        //dans la file
+          FilePredecesseur[File[0]]= File[0];
+          if(FlotMin > (courant->Cap_S_Nord - courant->flot_S_Nord))
+          {
+            FlotMin= courant->Cap_S_Nord - courant->flot_S_Nord;
+          }
+        }
+      }
+    }    
+
+    File.erase(File.begin());// suppression l'élément de la file
   }   
 }
 //----------------------------Constructeur graphe--------------------------------
