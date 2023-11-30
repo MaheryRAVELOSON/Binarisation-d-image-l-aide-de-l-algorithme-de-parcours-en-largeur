@@ -62,6 +62,7 @@ void Graphe::sauver(const string & filename) {
 //-------------------------------------------------------------------------------
 Pixel * Graphe::GetAdPixel(const int i, const int j)
 {
+  assert(i*C+j>=0 && i*C+j<L*C);
   return & TabPixel[i*C+j];
 }
 
@@ -206,6 +207,7 @@ void Graphe::SetCap()
 int Graphe::IndiceTab(Pixel * AdPixel)
 {
   int i = 0;
+
   while ((&TabPixel[i]!= AdPixel) && (i < L*C))
   {
     if (&TabPixel[i]== AdPixel)
@@ -214,6 +216,12 @@ int Graphe::IndiceTab(Pixel * AdPixel)
     }
     i++; 
   }
+
+  if (&TabPixel[i]== AdPixel)
+  {
+    return i;
+  }
+
    return -1; // en cas d'innéxistance
 }
 
@@ -226,19 +234,19 @@ int Graphe::GetCap(Pixel * AdPixelDepart, Pixel * AdPixelArrivee)
     return -1;
   }
 
-  if(&TabPixel[L*C] == AdPixelDepart)
-  {
-    return AdPixelDepart->Cap_E_Source;
-  }
-
   if(&TabPixel[L*C] == AdPixelArrivee)
   {
     return 0;
   }
 
-  if(AdPixelDepart->Sortant_Puit == AdPixelDepart)
+  if(&TabPixel[L*C+1] == AdPixelDepart)
   {
     return 0;
+  }
+
+  if(&TabPixel[L*C] == AdPixelDepart)
+  {
+    return AdPixelArrivee->Cap_E_Source;
   }
 
   if(AdPixelDepart->Sortant_Nord == AdPixelArrivee)
@@ -268,6 +276,7 @@ int Graphe::GetCap(Pixel * AdPixelDepart, Pixel * AdPixelArrivee)
 
   //cout<<endl<<"---Test---"<<endl;
   
+  assert(1==2);
   return -1;
 }
 
@@ -281,7 +290,7 @@ int Graphe::GetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee)
 
   if(&TabPixel[L*C] == AdPixelDepart)
   {
-    return AdPixelDepart->flot_E_Source;
+    return AdPixelArrivee->flot_E_Source;
   }
 
   if(&TabPixel[L*C] == AdPixelArrivee)
@@ -289,7 +298,7 @@ int Graphe::GetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee)
     return 0;
   }
 
-  if(AdPixelDepart->Sortant_Puit == AdPixelDepart)
+  if(&TabPixel[L*C+1] == AdPixelDepart)
   {
     return 0;
   }
@@ -319,6 +328,7 @@ int Graphe::GetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee)
     return AdPixelDepart->flot_S_Puit;
   }
 
+  assert(1==2);
   return -1;
 }
 
@@ -330,6 +340,24 @@ int Graphe::SetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee, int NewFlot)
     return -1;
   }
 
+  if(&TabPixel[L*C] == AdPixelArrivee)
+  {
+    assert(1==2);
+    return -1;
+  }
+
+  if(&TabPixel[L*C+1] == AdPixelDepart)
+  {
+    assert(1==2);
+    return -1;
+  }
+  
+  if(&TabPixel[L*C] == AdPixelDepart)
+  {
+    AdPixelArrivee->flot_E_Source = NewFlot;
+    return 0;
+  }
+  
   if(AdPixelDepart->Sortant_Nord == AdPixelArrivee)
   {
     AdPixelDepart->flot_S_Nord = NewFlot;
@@ -360,11 +388,6 @@ int Graphe::SetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee, int NewFlot)
     return 0;
   }
 
-  if(&TabPixel[L*C] == AdPixelDepart)
-  {
-    return AdPixelDepart->flot_E_Source = NewFlot;
-  }
-
   return -1;
 }
 
@@ -373,7 +396,9 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
 {
   int TemponIndice= IndPixArrive;
   assert(TemponIndice>=0 && TemponIndice< L*C+2);
-  int FlotMin= TabPixel[TemponIndice].Cap_S_Puit - TabPixel[TemponIndice].flot_S_Puit;
+  
+
+  int FlotMin= TabPixel[TabPred[TemponIndice]].Cap_S_Puit - TabPixel[TabPred[TemponIndice]].flot_S_Puit;
   int Flot;
 
   assert(TabPred[IndPixArrive]< L*C+1);
@@ -381,18 +406,18 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
   assert(IndPixArrive>= 0 && IndPixArrive < L*C+2);
 
   int CapDepuisPredecesseur;
-
+  
   //int CapVersPredecesseur= GetCap(&TabPixel[IndPixArrive], &TabPixel[TabPred[IndPixArrive]]);
   int FlotVersPredecesseur;
   
   int FlotDepuisPredecesseur;
   
-  int verif= 0;//0= pas de problème et -1 sinon
+  int verif= 0; //0= pas de problème et -1 sinon
   int x;
 
   while(TabPred[TemponIndice] > -1) //Recherche de la plus petite flot
   {
-    cout<<endl<<"-----Test1-----"<<endl;
+    //cout<<endl<<"-----Test1-----"<<endl;
 
     CapDepuisPredecesseur = GetCap(&TabPixel[TabPred[TemponIndice]], &TabPixel[TemponIndice]);
     assert (CapDepuisPredecesseur >= 0); // sinon = à -1 donc problème
@@ -402,8 +427,10 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
 
     FlotVersPredecesseur= GetFlot(&TabPixel[TemponIndice], &TabPixel[TabPred[TemponIndice]]);
     //assert (FlotVersPredecesseur >= 0); // -1 si un pixel vers la source
+    //cout<<endl<<FlotVersPredecesseur<<endl;
 
     Flot= CapDepuisPredecesseur - FlotDepuisPredecesseur + FlotVersPredecesseur;
+
     if((FlotMin>Flot) && (Flot>0))
     {
       FlotMin = Flot;
@@ -415,6 +442,8 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
   TemponIndice= IndPixArrive;
   while(TabPred[TemponIndice] > -1) //Reglage des flot
   {
+      
+      //cout<<endl<<"-----Test2-----"<<endl; // Normalement mm nbr d'affichage du Test1
       
       CapDepuisPredecesseur = GetCap(&TabPixel[TabPred[TemponIndice]], &TabPixel[TemponIndice]);
       assert (CapDepuisPredecesseur >= 0); // sinon = à -1 donc problème
@@ -455,7 +484,7 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
 //----------------------------Parcours en Largeur--------------------------------
 int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide 
 {
-  Pixel *courant ; // il va parcourir la file 
+  Pixel * courant ; // il va parcourir la file 
   Pixel TemponFilsCourant;
   vector<int> File; //pour stocker les INDICE de l'ordre des pixels dans la file pour le parcours en largeur
   int TabPredecesseur[L*C+2];// Pour stocker les indices des prédecesseur du pixel qui sont dans la file
@@ -468,6 +497,8 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
    { //stockage de son indice sur les files 
     File.push_back(i);
     TabPredecesseur[i]= L*C;
+    //cout<<endl<<TabPixel[File[0]].Cap_E_Source<<endl;
+    //cout<<endl<<TabPredecesseur[i]<<endl;
    }
    else
    {
@@ -476,6 +507,7 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
    PixelDejaVu[i]= false;
   }
   TabPredecesseur[L*C]= -1;
+  TabPredecesseur[L*C+1] = -1;
 //------------------------
   while (File.size() > 0 ) // tant que on a pas fini à lire l'entiérté de la file alors on continue
   {
@@ -492,7 +524,6 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
       Flot = FlotMin(TabPredecesseur, L*C+1); //Augmentation du flot dans l'arc à max
       assert(Flot > -1);
       assert(TabPixel[File[0]].flot_S_Puit <= TabPixel[File[0]].Cap_S_Puit);
-      //cout<<endl<<"-----Test-----"<<endl;
       return Flot;
     }
 
@@ -579,6 +610,25 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
 
   return -1;
 }
+
+//------------------------------------CoupeGraphe--------------------------------
+int Graphe::coupeGraphe()
+{
+  for(int i=0; i<L*C; i++)
+  {
+    if((TabPixel[i].Cap_E_Source - TabPixel[i].flot_E_Source) == 0) //=> relié à la source
+    {
+      TabPixel[i].intensite= 255;
+    }
+    else
+    {
+      TabPixel[i].intensite= 0;
+    }
+  }
+
+  return 0;
+}
+
 //----------------------------Constructeur graphe--------------------------------
 Graphe::Graphe()
 {
@@ -596,4 +646,6 @@ Graphe::Graphe()
     TabPixel[L*C].intensite += flot;
     cout<<endl<<"flot = "<<flot<<" et flot max = "<<TabPixel[L*C].intensite<<endl;
   }while(flot > 0);
+
+  coupeGraphe();
 }

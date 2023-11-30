@@ -61,6 +61,9 @@ int GetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee); // retourner le Flot
 //-------------------------------------------------------------------------------
 int SetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee, int NewFlot); // modifie le Flot d'un arc entre 2 Pixel
 //renvoie -1 si arc introuvalbe
+
+//-------------------------------------------------------------------------------
+int coupeGraphe(); //il va changer les intensité soit à 0, soit à 255
 };
 
 
