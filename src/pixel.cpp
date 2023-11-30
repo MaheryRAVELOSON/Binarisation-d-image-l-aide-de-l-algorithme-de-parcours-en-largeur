@@ -20,7 +20,7 @@ Pixel::Pixel()
     Cap_S_Ouest= 0;
     flot_S_Ouest= 0;
 
-    Entrant_Source= nullptr;
+    //Entrant_Source= nullptr;
     Cap_E_Source= 0;
     flot_E_Source= 0;
 

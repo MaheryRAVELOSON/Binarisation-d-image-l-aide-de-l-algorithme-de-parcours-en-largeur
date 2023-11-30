@@ -75,7 +75,8 @@ int main(void)
     cout<<endl<<"ln de 1 = "<<ln(1)<<endl;
     */
 
-//___________________________Affichage des capacités entre pixels 
+//___________________________Affichage des capacités entre pixels
+/*
     cout<<endl<<"---Affichage des capacités entre pixels  "<<endl;
     for (int i = 0; i < TestGraphe.L; i++)
     {
@@ -89,6 +90,13 @@ int main(void)
     }
     
     cout<<TestGraphe.TabPixel[0].Sortant_Sud->intensite<<endl;
+*/
+
+//___________________________Affichage du flot maximale trouvé
+
+    cout<<endl<<"---Affichage du flot maximale trouvé: "<<endl;
+    cout<<endl<<"flot maximale trouvé = "<<TestGraphe.TabPixel[TestGraphe.L*TestGraphe.C].intensite<<endl;
+    cout<<endl<<"---Fin Affichage du flot maximale trouvé "<<endl;
 
 //___________________________Sauvegarde du fichier
     std::string nomFichier= "data/La_Notre.pgm";

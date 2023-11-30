@@ -33,7 +33,7 @@ class Pixel
     int Cap_S_Puit;
     int flot_S_Puit;
 //------------------
-    Pixel * Entrant_Source;
+    //Pixel * Entrant_Source;
     int Cap_E_Source;
     int flot_E_Source;
     

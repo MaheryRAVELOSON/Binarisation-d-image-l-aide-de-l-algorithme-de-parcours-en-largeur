@@ -45,6 +45,22 @@ class Graphe
     int ParcoursLargeur();
 //-------------------------------------------------------------------------------
     int IndiceTab(Pixel * AdPixel);
+
+//-------------------------------------------------------------------------------
+int FlotMin(int TabPred[], int IndPixArrive);// pour trouver le flot minimal et augmenter les flots
+//il renvoie le flot minimal sinon -1 en cas d'erreur
+
+//-------------------------------------------------------------------------------
+int GetCap(Pixel * AdPixelDepart, Pixel * AdPixelArrivee); // retourner la capacité d'un arc entre 2 Pixel
+//renvoie -1 si arc introuvalbe
+
+//-------------------------------------------------------------------------------
+int GetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee); // retourner le Flot d'un arc entre 2 Pixel
+//renvoie -1 si arc introuvalbe
+
+//-------------------------------------------------------------------------------
+int SetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee, int NewFlot); // modifie le Flot d'un arc entre 2 Pixel
+//renvoie -1 si arc introuvalbe
 };
 
 
