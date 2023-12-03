@@ -106,11 +106,9 @@ void Graphe::InitVoisin()
 //-------------------------------------------------------------------------------
 void Graphe::SetCap()
 {
-  //float D1 = 0;
-  //float D2 = 0;
-  //float Moyenne= 0;
-  float sigma= 10;
-  float alpha= 10;
+  //Plus le alpha = sigma est grand, plus l'image est bien et plus le temps de calcule est énorme
+  float sigma= 1.2; // !!! Il faut que le sigma soit inférieur ou égale à alpha !!!
+  float alpha= 0.9; //plus on augmente, plus on aura des Cap_E_Source > à 0. => augmentation du flot max
   float H    = 100;
 
   for(int i=0; i<L; i++)
@@ -181,7 +179,8 @@ void Graphe::SetCap()
       if(TabPixel[Ind_P_Actuel].Cap_E_Source<0)
       {
         TabPixel[Ind_P_Actuel].Cap_E_Source= 0; //utile car il y a des valeur comme
-      }                                         // -2147483648
+      }   // -2147483648
+      cout<<endl<<"Intensité = "<<TabPixel[Ind_P_Actuel].intensite<<" et Cap_E_Source: "<<Cap_S<<endl;
 
 //_________________Pour Arc Puit
       float Int = float(TabPixel[Ind_P_Actuel].intensite + 0.0000000001);
@@ -231,6 +230,7 @@ int Graphe::GetCap(Pixel * AdPixelDepart, Pixel * AdPixelArrivee)
 
   if((AdPixelDepart==nullptr) || (AdPixelArrivee==nullptr))
   {
+    assert(1==2);
     return -1;
   }
 
@@ -285,6 +285,7 @@ int Graphe::GetFlot(Pixel * AdPixelDepart, Pixel * AdPixelArrivee)
 {
   if((AdPixelDepart==nullptr) || (AdPixelArrivee==nullptr))
   {
+    assert(1==2);
     return -1;
   }
 
@@ -414,10 +415,12 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
   
   int verif= 0; //0= pas de problème et -1 sinon
   int x;
+  int z= 0;
 
   while(TabPred[TemponIndice] > -1) //Recherche de la plus petite flot
   {
     //cout<<endl<<"-----Test1-----"<<endl;
+    z++;
 
     CapDepuisPredecesseur = GetCap(&TabPixel[TabPred[TemponIndice]], &TabPixel[TemponIndice]);
     assert (CapDepuisPredecesseur >= 0); // sinon = à -1 donc problème
@@ -426,19 +429,19 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
     assert (FlotDepuisPredecesseur >= 0);
 
     FlotVersPredecesseur= GetFlot(&TabPixel[TemponIndice], &TabPixel[TabPred[TemponIndice]]);
-    //assert (FlotVersPredecesseur >= 0); // -1 si un pixel vers la source
+    assert (FlotVersPredecesseur >= 0); // -1 si un pixel vers la source
     //cout<<endl<<FlotVersPredecesseur<<endl;
 
     Flot= CapDepuisPredecesseur - FlotDepuisPredecesseur + FlotVersPredecesseur;
 
-    if((FlotMin>Flot) && (Flot>0))
+    if((FlotMin>Flot) && (Flot>=0))
     {
       FlotMin = Flot;
     }
 
     TemponIndice = TabPred[TemponIndice]; //on reviens à chaque fois en arrière
   }
-
+  cout <<endl<< "Nbr arc trouvé pour un chemin valide=" <<z << endl;
   TemponIndice= IndPixArrive;
   while(TabPred[TemponIndice] > -1) //Reglage des flot
   {
@@ -458,15 +461,19 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
       if((FlotDepuisPredecesseur+FlotMin) > CapDepuisPredecesseur)
       {
         x= FlotVersPredecesseur - (FlotDepuisPredecesseur+FlotMin - CapDepuisPredecesseur); //flot inverse - le flot en trop
-        if( x >= 0)
-        {
+        if(x >= 0) //Si on peut le décremonter
+        {//Impossible d'avoir TemponIndice = L*C grace à la condition du while car pred de L*C = -1
+         //Impossible d'avoir x > 0 pour TemponIndice = L*C+1 car le flot min par défaut est celle du Cap_S_Puit - flot_S_Puit
+          assert(TemponIndice != L*C);
+          assert(TemponIndice != L*C+1);
           verif= SetFlot(&TabPixel[TabPred[TemponIndice]], &TabPixel[TemponIndice], CapDepuisPredecesseur);
           assert(verif > -1);
-          verif= SetFlot(&TabPixel[TemponIndice], &TabPixel[TabPred[TemponIndice]], FlotVersPredecesseur- x);
+          verif= SetFlot(&TabPixel[TemponIndice], &TabPixel[TabPred[TemponIndice]], FlotVersPredecesseur- (FlotDepuisPredecesseur+FlotMin - CapDepuisPredecesseur));
           assert(verif > -1);
         }
         else
         {
+          assert(1==2);
           return 0; // ou -1 (=erreur): à voir
         }
       }
@@ -491,14 +498,12 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
   bool PixelDejaVu[L*C]; // pour marquer les indices des pixels deja exploiter
   assert(File.size()==0);
   
-  for (int i = 0; i < L*C; i++) // stockage de tt les indices du pixels qui sont liés à la source
+  for (int i = 0; i < L*C; i++) // Initialisation des tableau PixelDejaVu et TabPredecesseur
   {
-   if(TabPixel[i].Cap_E_Source > 0) // si le pixel est relié à la source 
-   { //stockage de son indice sur les files 
+   if((TabPixel[i].Cap_E_Source > 0) && ((TabPixel[i].Cap_E_Source - TabPixel[i].flot_E_Source) > 0))
+   { // si le pixel est relié à la source  //stockage de son indice sur les files 
     File.push_back(i);
-    TabPredecesseur[i]= L*C;
-    //cout<<endl<<TabPixel[File[0]].Cap_E_Source<<endl;
-    //cout<<endl<<TabPredecesseur[i]<<endl;
+    TabPredecesseur[i]= L*C; //leur prédécesseur est la source
    }
    else
    {
@@ -517,12 +522,13 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
 
 // verification du chemin DIRECTE vers le Puit avant de continuer sur ses voisins
     int Flot = courant->Cap_S_Puit - courant->flot_S_Puit;
+    //cout<<"indice n°"<<File[0]<<" Et flot libre = "<<Flot<<endl;
     if(Flot > 0)
     {
       TabPredecesseur[L*C+1]= File[0];
       //On cherche le flot minimal que si on a un chemin vers le puit libre: pas plein
       Flot = FlotMin(TabPredecesseur, L*C+1); //Augmentation du flot dans l'arc à max
-      assert(Flot > -1);
+      assert(Flot > 0);
       assert(TabPixel[File[0]].flot_S_Puit <= TabPixel[File[0]].Cap_S_Puit);
       return Flot;
     }
@@ -539,7 +545,7 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
         {//si il est encore accessible
           File.push_back(IndiceNord); // on le stocke dans la file donc
           PixelDejaVu[IndiceNord]= true; // on le marque comme deja traité pour éviter de le rajouter plusieurs
-                                        //dans la file
+                                        //dans la file si il est le voisin des prochain pixel qu'on va traiter
           TabPredecesseur[IndiceNord]= File[0];
         }
       }
@@ -644,7 +650,11 @@ Graphe::Graphe()
   do{
     flot = ParcoursLargeur(); //Augmentation du flot en trouvant des chemin valide
     TabPixel[L*C].intensite += flot;
-    cout<<endl<<"flot = "<<flot<<" et flot max = "<<TabPixel[L*C].intensite<<endl;
+    //cout<<endl<<"flot = "<<flot<<" et flot max = "<<TabPixel[L*C].intensite<<endl;
+    nomFichier= "data/La_Notre.pgm";
+    coupeGraphe(); // pour le débogage
+    sauver(nomFichier); // pour le débogage
+    cout<<endl<<"Recherche de nouveaux chemin valide ..."<<endl;
   }while(flot > 0);
 
   coupeGraphe();

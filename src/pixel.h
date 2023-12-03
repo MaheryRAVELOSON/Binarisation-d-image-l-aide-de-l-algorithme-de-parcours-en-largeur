@@ -36,7 +36,6 @@ class Pixel
     //Pixel * Entrant_Source;
     int Cap_E_Source;
     int flot_E_Source;
-    
 //-------------------------------------------------------------------------------
     Pixel();
 };
