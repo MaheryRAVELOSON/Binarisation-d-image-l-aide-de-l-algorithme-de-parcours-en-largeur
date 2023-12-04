@@ -107,7 +107,7 @@ void Graphe::InitVoisin()
 void Graphe::SetCap()
 {
   //Plus le alpha = sigma est grand, plus l'image est bien et plus le temps de calcule est énorme
-  float sigma= 1.2; // !!! Il faut que le sigma soit inférieur ou égale à alpha !!!
+  float sigma= 0.9; // !!! Il faut que le sigma soit inférieur ou égale à alpha !!!
   float alpha= 0.9; //plus on augmente, plus on aura des Cap_E_Source > à 0. => augmentation du flot max
   float H    = 100;
 
@@ -645,17 +645,19 @@ Graphe::Graphe()
   TabPixel[L*C+1].intensite= 0;
   InitVoisin(); //remplissage des 4 arcs voisins de chaque pixel.
   SetCap();
+  cout<<endl<<"--Debut de recherche de chemin valide..."<<endl;
 
   int flot= 0;
   do{
     flot = ParcoursLargeur(); //Augmentation du flot en trouvant des chemin valide
-    TabPixel[L*C].intensite += flot;
+    TabPixel[L*C].intensite = TabPixel[L*C].intensite + flot;
     //cout<<endl<<"flot = "<<flot<<" et flot max = "<<TabPixel[L*C].intensite<<endl;
     nomFichier= "data/La_Notre.pgm";
     coupeGraphe(); // pour le débogage
     sauver(nomFichier); // pour le débogage
     cout<<endl<<"Recherche de nouveaux chemin valide ..."<<endl;
+    cout<<endl<<"Flot max tactuel= "<<TabPixel[L*C].intensite<<endl;
   }while(flot > 0);
 
   coupeGraphe();
-}
+} 
