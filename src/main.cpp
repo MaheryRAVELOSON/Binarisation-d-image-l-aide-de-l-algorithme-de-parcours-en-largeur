@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    Graphe TestGraphe;
+    Graphe TestGraphe("data/data5.pgm");
 //___________________________Affichage des données
     /*cout<<endl<<"---Affichage des données---"<<endl;
     for(int i= 0; i<TestGraphe.L*TestGraphe.C; i++)
@@ -95,7 +95,7 @@ int main(void)
 //___________________________Affichage du flot maximale trouvé
 
     cout<<endl<<"---Affichage du flot maximale trouvé: "<<endl;
-    cout<<endl<<"flot maximale trouvé = "<<TestGraphe.TabPixel[TestGraphe.L*TestGraphe.C].intensite<<endl;
+    cout<<endl<<"flot maximale trouvé = "<<TestGraphe.FlotMaximal<<endl;
     cout<<endl<<"---Fin Affichage du flot maximale trouvé "<<endl;
 
 //___________________________Sauvegarde du fichier

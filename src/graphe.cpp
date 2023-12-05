@@ -36,7 +36,7 @@ void Graphe::ouvrir(const string & filename)
 }
 
 //-------------------------------------------------------------------------------
-int Graphe::GetIndPixel(const int i, const int j)
+int Graphe::GetIndPixel(const int i, const int j) // il transforme le i j en vrai indice à 1D
 {
   return i*C+j;
 }
@@ -107,8 +107,8 @@ void Graphe::InitVoisin()
 void Graphe::SetCap()
 {
   //Plus le alpha = sigma est grand, plus l'image est bien et plus le temps de calcule est énorme
-  const float sigma= 0.9; // !!! Il faut que le sigma soit inférieur ou égale à alpha !!!
-  const float alpha= 0.9; //plus on augmente, plus on aura des Cap_E_Source > à 0. => augmentation du flot max
+  const float sigma= 0.9;//0.7 // !!! Il faut que le sigma soit inférieur ou égale à alpha !!!
+  const float alpha= 0.9;//1.5 //plus on augmente, plus on aura des Cap_E_Source > à 0. => augmentation du flot max
   float H    = 100;
 
   for(int i=0; i<L; i++)
@@ -234,14 +234,14 @@ int Graphe::GetCap(Pixel * AdPixelDepart, Pixel * AdPixelArrivee)
     return -1;
   }
 
-  if(&TabPixel[L*C] == AdPixelArrivee)
+  if(&TabPixel[L*C] == AdPixelArrivee) // si adresse de d'arrivée ==  @source
   {
-    return 0;
+    return 0; // on retourne 0
   }
 
-  if(&TabPixel[L*C+1] == AdPixelDepart)
+  if(&TabPixel[L*C+1] == AdPixelDepart) // si @depart == au puit
   {
-    return 0;
+    return 0;// retourne 0
   }
 
   if(&TabPixel[L*C] == AdPixelDepart)
@@ -398,7 +398,8 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
   int TemponIndice= IndPixArrive;
   assert(TemponIndice>=0 && TemponIndice< L*C+2);
   
-
+  //initialisation du flot minimal trouvé: par défaut le flot entre la puit et son prédecesseur car
+  // ce chemin existe forcément sinon on n'aurai pas appeller la fontion FlotMin
   int FlotMin= TabPixel[TabPred[TemponIndice]].Cap_S_Puit - TabPixel[TabPred[TemponIndice]].flot_S_Puit;
   int Flot;
 
@@ -436,7 +437,7 @@ int Graphe::FlotMin(int TabPred[], int IndPixArrive)
 
     if((FlotMin>Flot) && (Flot>=0))
     {
-      FlotMin = Flot;
+      FlotMin = Flot;// 
     }
 
     TemponIndice = TabPred[TemponIndice]; //on reviens à chaque fois en arrière
@@ -501,15 +502,16 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
   for (int i = 0; i < L*C; i++) // Initialisation des tableau PixelDejaVu et TabPredecesseur
   {
    if((TabPixel[i].Cap_E_Source > 0) && ((TabPixel[i].Cap_E_Source - TabPixel[i].flot_E_Source) > 0))
-   { // si le pixel est relié à la source  //stockage de son indice sur les files 
-    File.push_back(i);
+   { // si le pixel est relié à la source et capacité non atteint => stockage de son indice sur les files 
+    File.push_back(i); // rappelle: le File stocke l'indice
     TabPredecesseur[i]= L*C; //leur prédécesseur est la source
+    PixelDejaVu[i]= true; // pour ne pas être stocker plusieurs fois.
    }
    else
    {
     TabPredecesseur[i]= -1;
    } 
-   PixelDejaVu[i]= false;
+   PixelDejaVu[i]= false; // car pas encore stocké dans la file
   }
   TabPredecesseur[L*C]= -1;
   TabPredecesseur[L*C+1] = -1;
@@ -606,7 +608,7 @@ int Graphe::ParcoursLargeur() // la fonction s'arretra a chaque chemin valide
 
     File.erase(File.begin());// suppression l'élément de la file
   }
-
+  // si on lit se ligne, c'est qu'on n'a plus de chemin valide.
   assert(File.size() <= 0);
   
   if(File.size() <= 0) //condition de sortie du while => file vide => plus de chemin disponible
@@ -636,10 +638,11 @@ int Graphe::coupeGraphe()
 }
 
 //----------------------------Constructeur graphe--------------------------------
-Graphe::Graphe()
+Graphe::Graphe(std::string nomFichier)
 {
+  FlotMaximal = 0;
   TabPixel = nullptr;
-  std::string nomFichier= "data/data2.pgm";
+  //std::string nomFichier= "data/data2.pgm";
   ouvrir(nomFichier); //remplissage des INTENSITEE seulement de chaque pixel
   TabPixel[L*C].intensite= 0; // l'intensité de la source stockera le flot max.
   TabPixel[L*C+1].intensite= 0;
@@ -650,13 +653,13 @@ Graphe::Graphe()
   int flot= 0;
   do{
     flot = ParcoursLargeur(); //Augmentation du flot en trouvant des chemin valide
-    TabPixel[L*C].intensite = TabPixel[L*C].intensite + flot;
+    FlotMaximal = FlotMaximal + flot;
     //cout<<endl<<"flot = "<<flot<<" et flot max = "<<TabPixel[L*C].intensite<<endl;
     nomFichier= "data/La_Notre.pgm";
     coupeGraphe(); // pour le débogage
     sauver(nomFichier); // pour le débogage
     cout<<endl<<"Recherche de nouveaux chemin valide ..."<<endl;
-    cout<<endl<<"Flot max tactuel= "<<TabPixel[L*C].intensite<<endl; // visible que pour des
+    cout<<endl<<"Flot max tactuel= "<<FlotMaximal<<endl; // visible que pour des
     //sigma et alpha grand car si trop petit, le programme s'execute et finis très vite.
   }while(flot > 0);
 
