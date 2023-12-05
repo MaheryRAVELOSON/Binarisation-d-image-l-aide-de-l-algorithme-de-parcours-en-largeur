@@ -107,8 +107,8 @@ void Graphe::InitVoisin()
 void Graphe::SetCap()
 {
   //Plus le alpha = sigma est grand, plus l'image est bien et plus le temps de calcule est énorme
-  float sigma= 0.9; // !!! Il faut que le sigma soit inférieur ou égale à alpha !!!
-  float alpha= 0.9; //plus on augmente, plus on aura des Cap_E_Source > à 0. => augmentation du flot max
+  const float sigma= 0.9; // !!! Il faut que le sigma soit inférieur ou égale à alpha !!!
+  const float alpha= 0.9; //plus on augmente, plus on aura des Cap_E_Source > à 0. => augmentation du flot max
   float H    = 100;
 
   for(int i=0; i<L; i++)
@@ -174,7 +174,7 @@ void Graphe::SetCap()
       }
 //_________________Pour Arc Source
       float Diff_I = 255.0000000001-TabPixel[Ind_P_Actuel].intensite;
-      float Cap_S  = - alpha * ln(Diff_I/255.0000000002);
+      float Cap_S  = - alpha * log(Diff_I/255.0000000002);
       TabPixel[Ind_P_Actuel].Cap_E_Source = Cap_S;
       if(TabPixel[Ind_P_Actuel].Cap_E_Source<0)
       {
@@ -186,7 +186,7 @@ void Graphe::SetCap()
       float Int = float(TabPixel[Ind_P_Actuel].intensite + 0.0000000001);
 
       float final= (Int/255.0000000002);
-      float Cap_P  = - alpha * ln(final);
+      float Cap_P  = - alpha * log(final);
       TabPixel[Ind_P_Actuel].Cap_S_Puit = int(Cap_P);
       if(TabPixel[Ind_P_Actuel].Cap_S_Puit<0)
       {
@@ -639,7 +639,7 @@ int Graphe::coupeGraphe()
 Graphe::Graphe()
 {
   TabPixel = nullptr;
-  std::string nomFichier= "data/data.pgm";
+  std::string nomFichier= "data/data2.pgm";
   ouvrir(nomFichier); //remplissage des INTENSITEE seulement de chaque pixel
   TabPixel[L*C].intensite= 0; // l'intensité de la source stockera le flot max.
   TabPixel[L*C+1].intensite= 0;
@@ -656,7 +656,8 @@ Graphe::Graphe()
     coupeGraphe(); // pour le débogage
     sauver(nomFichier); // pour le débogage
     cout<<endl<<"Recherche de nouveaux chemin valide ..."<<endl;
-    cout<<endl<<"Flot max tactuel= "<<TabPixel[L*C].intensite<<endl;
+    cout<<endl<<"Flot max tactuel= "<<TabPixel[L*C].intensite<<endl; // visible que pour des
+    //sigma et alpha grand car si trop petit, le programme s'execute et finis très vite.
   }while(flot > 0);
 
   coupeGraphe();
